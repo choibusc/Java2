@@ -21,7 +21,7 @@ public class LAB_DecodeSecureTest {
                 decode = "";
                 for (int i = 0; i < line.length(); i++){
                     int num = (int)line.charAt(i);
-                    num -= 100; // 해독을 위해 -100 으로 변경
+                    num -= 100;
                     decode += (char)num;
                 }
 
