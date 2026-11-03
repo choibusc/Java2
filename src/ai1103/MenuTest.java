@@ -4,17 +4,41 @@ import center.SetFrame;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.io.*;
 import javax.swing.*;
 
 public class MenuTest extends JFrame {
 
     JTextArea textArea = new JTextArea();
     JFileChooser fileChooser = new JFileChooser();
-    JFrame frame = this;
+    JFrame frame;
+    String[] iconFileNames = {"new", "open", "close"};
+    Color[] colorNames = {Color.WHITE, Color.BLUE, Color.MAGENTA};
+    JButton[] btns = new JButton[6];
 
     public MenuTest(){
-        add(textArea);
+        frame = this;
+
+        JScrollPane scrollPane = new JScrollPane(
+                textArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        );
+        add(scrollPane);
+
+        JToolBar toolBar = new JToolBar();
+        add("North", toolBar);
+
+        for (int i = 0; i < btns.length; i++) {
+            if (i < 3) {
+                btns[i] = new JButton(new ImageIcon("toolbar/" + iconFileNames[i] + ".png"));
+            } else {
+                btns[i] = new JButton("   ");
+                btns[i].setBackground(colorNames[i - 3]);
+            }
+            btns[i].addActionListener(btnListener);
+            toolBar.add(btns[i]);
+        }
 
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
@@ -52,6 +76,32 @@ public class MenuTest extends JFrame {
         SetFrame.setFrame(this, "메뉴만들기", 500, 500);
     }
 
+    ActionListener btnListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton eBtn = (JButton) e.getSource();
+            File selectedFile;
+
+            if (eBtn == btns[0]){
+                textArea.setText("");
+            } else if (eBtn == btns[1]){
+                fileChooser.showOpenDialog(frame);
+                selectedFile = fileChooser.getSelectedFile();
+                if (selectedFile != null) {
+                    textArea.setText(readFile(selectedFile));
+                }
+            } else if (eBtn == btns[2]){
+                System.exit(0);
+            }
+
+            for (int i = 0; i < colorNames.length; i++) {
+                if (eBtn == btns[i + 3]) {
+                    textArea.setBackground(colorNames[i]);
+                }
+            }
+        }
+    };
+
     ActionListener fileListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -63,7 +113,9 @@ public class MenuTest extends JFrame {
                 case "Open":
                     fileChooser.showOpenDialog(frame);
                     selectedFile = fileChooser.getSelectedFile();
-                    textArea.setText(selectedFile.getAbsolutePath());
+                    if (selectedFile != null) {
+                        textArea.setText(readFile(selectedFile));
+                    }
                     break;
                 case "Close":
                     System.exit(0);
@@ -78,18 +130,32 @@ public class MenuTest extends JFrame {
             Color color = null;
             switch (e.getActionCommand()){
                 case "White":
-                    color = Color.WHITE;
+                    color = colorNames[0];
                     break;
                 case "Blue":
-                    color = Color.BLUE;
+                    color = colorNames[1];
                     break;
                 case "Magenta":
-                    color = Color.MAGENTA;
+                    color = colorNames[2];
                     break;
             }
             textArea.setBackground(color);
         }
     };
+
+    public String readFile(File file) {
+        if (file == null) return "";
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
 
     public static void main(String[] args) {
         new MenuTest();
