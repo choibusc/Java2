@@ -49,29 +49,39 @@ public class MenuTest extends JFrame {
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
 
+        // ===== File 메뉴 =====
         JMenuItem newMenuItem = new JMenuItem("New");
         JMenuItem openMenuItem = new JMenuItem("Open");
+        JMenuItem saveMenuItem = new JMenuItem("Save");
         JMenuItem closeMenuItem = new JMenuItem("Close");
 
         fileMenu.add(newMenuItem);
         fileMenu.add(openMenuItem);
+        fileMenu.add(saveMenuItem);
+        fileMenu.addSeparator();
         fileMenu.add(closeMenuItem);
 
         newMenuItem.addActionListener(fileListener);
         openMenuItem.addActionListener(fileListener);
+        saveMenuItem.addActionListener(fileListener);
         closeMenuItem.addActionListener(fileListener);
 
+        // ===== Edit 메뉴 =====
         JMenuItem whiteMenuItem = new JMenuItem("White");
         JMenuItem blueMenuItem = new JMenuItem("Blue");
         JMenuItem magentaMenuItem = new JMenuItem("Magenta");
+        JMenuItem selectAllMenuItem = new JMenuItem("Select All");
 
         editMenu.add(whiteMenuItem);
         editMenu.add(blueMenuItem);
         editMenu.add(magentaMenuItem);
+        editMenu.addSeparator();
+        editMenu.add(selectAllMenuItem);
 
         whiteMenuItem.addActionListener(backgroundListener);
         blueMenuItem.addActionListener(backgroundListener);
         magentaMenuItem.addActionListener(backgroundListener);
+        selectAllMenuItem.addActionListener(editListener);
 
         SetFrame.setFrame(this, "메뉴만들기", 500, 500);
     }
@@ -117,6 +127,9 @@ public class MenuTest extends JFrame {
                         textArea.setText(readFile(selectedFile));
                     }
                     break;
+                case "Save":                              // [추가] 저장 기능
+                    saveFile();
+                    break;
                 case "Close":
                     System.exit(0);
                     break;
@@ -142,6 +155,41 @@ public class MenuTest extends JFrame {
             textArea.setBackground(color);
         }
     };
+
+    // [추가] Edit 메뉴 - Select All
+    ActionListener editListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getActionCommand().equals("Select All")) {
+                textArea.requestFocus();
+                textArea.selectAll();
+            }
+        }
+    };
+
+    public void saveFile() {
+        int result = fileChooser.showSaveDialog(frame);
+        if (result != JFileChooser.APPROVE_OPTION) return;
+
+        File file = fileChooser.getSelectedFile();
+        if (file == null) return;
+
+        if (file.exists()) {
+            int answer = JOptionPane.showConfirmDialog(
+                    frame, "이미 존재하는 파일입니다. 덮어쓸까요?",
+                    "Save", JOptionPane.YES_NO_OPTION);
+            if (answer != JOptionPane.YES_OPTION) return;
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(textArea.getText());
+            JOptionPane.showMessageDialog(frame, "저장되었습니다.");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "저장 중 오류가 발생했습니다.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     public String readFile(File file) {
         if (file == null) return "";
