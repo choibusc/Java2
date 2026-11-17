@@ -16,6 +16,7 @@ public class BookRepository {
         String[] columnName = {"name", "publish_name", "author"};
         PreparedStatement pstmt = null;
         ResultSet rs = null;
+        bookList = new ArrayList<>();
 
         String sql = "select isbn, name, author, price, inventory, category_name, publish_name from book b, category c, publish p " +
                 "where b.category_id = c.category_id and b.publish_id = p.publish_id " +
@@ -36,16 +37,9 @@ public class BookRepository {
                 book.setPublish_name(rs.getString("publish_name"));
                 bookList.add(book);
             }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
-            try {
-                pstmt.close();
-                rs.close();
-                con.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
         }
 
         return bookList;
