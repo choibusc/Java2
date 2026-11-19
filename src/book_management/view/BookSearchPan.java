@@ -4,6 +4,7 @@ import book_management.domain.Book;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -40,6 +41,15 @@ public class BookSearchPan extends JPanel {
         };
 
         table = new JTable(model);
+        TableColumnModel tcm = table.getColumnModel();
+
+        tcm.getColumn(0).setPreferredWidth(60);
+        tcm.getColumn(1).setPreferredWidth(180);
+        tcm.getColumn(2).setPreferredWidth(120);
+        tcm.getColumn(3).setPreferredWidth(100);
+        tcm.getColumn(4).setPreferredWidth(70);
+        tcm.getColumn(5).setPreferredWidth(60);
+        tcm.getColumn(6).setPreferredWidth(80);
 
         JScrollPane scroll = new JScrollPane(table);
         putSearchResult();
